@@ -157,7 +157,10 @@ def update_charts(selected_year, selected_activity):
 
     # Line chart
     line_data = df[df['Economic_Activity'] == selected_activity]
-    line_data = line_data.sort_values(by="Qseries")  # Ensure years are in order
+        # Sort the DataFrame using a custom key
+    line_data["sorted_q"] = df["Qseries"].apply(lambda x: tuple(map(int, str(x).split('-'))))
+    line_data = line_data.sort_values(by="sorted_q").drop(columns=["sorted_q"])
+    #line_data = line_data.sort_values(by="Qseries")  # Ensure years are in order
 
     # Calculate percentage change for Saudis and Non-Saudis
     line_data['Saudis_change_perc'] = line_data['Number_Of_Saudis'].pct_change() * 100
@@ -168,7 +171,7 @@ def update_charts(selected_year, selected_activity):
     # Add lines for Saudis and Non-Saudis
     line_fig.add_trace(go.Scatter(
         x=line_data['Qseries'],
-        y=line_data['Number_Of_Saudis'],
+        y=line_data['Saudis_change_perc'],
         mode='lines+markers+text',
         name='Number of Saudis',
         text=[f"{v:.1f}%" if not pd.isnull(v) else "" for v in line_data['Saudis_change_perc']],
@@ -178,7 +181,7 @@ def update_charts(selected_year, selected_activity):
 
     line_fig.add_trace(go.Scatter(
         x=line_data['Qseries'],
-        y=line_data['Number_Of_Nonsaudis'],
+        y=line_data['NonSaudis_change_perc'],
         mode='lines+markers+text',
         name='Number of Non-Saudis',
         text=[f"{v:.1f}%" if not pd.isnull(v) else "" for v in line_data['NonSaudis_change_perc']],
@@ -187,7 +190,7 @@ def update_charts(selected_year, selected_activity):
     ))
 
     line_fig.update_layout(
-        title=f"Trend of Employment in {selected_activity}",
+        title=f"الاتجاه الوظيفي في {selected_activity}",
         xaxis_title='Year',
         yaxis_title='Number of Employees',
         font=dict(color="#333333"),
@@ -196,10 +199,10 @@ def update_charts(selected_year, selected_activity):
         title_x=0.5
     )
 
-    
+    lastQ = df_2024[df_2024["Q"] == 3]
     # Bar chart
-    top_activities = df_2024.nlargest(25, "Saudi_per")
-    last_activities = df_2024.nsmallest(25, "Saudi_per")
+    top_activities = lastQ.nlargest(5, "Saudi_per")
+    last_activities = lastQ.nsmallest(5, "Saudi_per")
     bar_fig = go.Figure()
     colors={
             'Number_Of_Saudis': '#008000',       # Emerald green
@@ -209,14 +212,14 @@ def update_charts(selected_year, selected_activity):
                             y=top_activities["Saudi_per"],
                             name="السعوديين %",
                             marker_color=colors["Number_Of_Saudis"],
-                            text=[f"{v:.1%}" for v in top_activities.head(25)["Saudi_per"]],  # Format as percentage
+                            text=[f"{v:.1%}" for v in top_activities.head(5)["Saudi_per"]],  # Format as percentage
                             textposition="outside"))
     
     bar_fig.add_trace(go.Bar(x=top_activities["Economic_Activity"],
                              y=top_activities["nonSaudi_per"],
                              name="غير السعوديين %",
                              marker_color=colors["Number_Of_Nonsaudis"],
-                             text=[f"{v:.1%}" for v in top_activities.head(25)["nonSaudi_per"]], 
+                             text=[f"{v:.1%}" for v in top_activities.head(5)["nonSaudi_per"]], 
                              textposition="outside"))
     bar_fig2 = go.Figure()
     
@@ -224,14 +227,14 @@ def update_charts(selected_year, selected_activity):
                             y=last_activities["Saudi_per"],
                             name="السعوديين %",
                             marker_color=colors["Number_Of_Saudis"],
-                            text=[f"{v:.1%}" for v in last_activities.head(25)["Saudi_per"]],  # Format as percentage
+                            text=[f"{v:.1%}" for v in last_activities.head(5)["Saudi_per"]],  # Format as percentage
                             textposition="outside"))
     
     bar_fig2.add_trace(go.Bar(x=last_activities["Economic_Activity"],
                              y=last_activities["nonSaudi_per"],
                              name="غير السعوديين %",
                              marker_color=colors["Number_Of_Nonsaudis"],
-                             text=[f"{v:.1%}" for v in last_activities.head(25)["nonSaudi_per"]], 
+                             text=[f"{v:.1%}" for v in last_activities.head(5)["nonSaudi_per"]], 
                              textposition="outside"))
     # Total employees
     filtered_df['total_employees'] = filtered_df['Number_Of_Saudis'] + filtered_df['Number_Of_Nonsaudis']
