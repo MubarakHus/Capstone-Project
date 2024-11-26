@@ -264,8 +264,28 @@ app.layout = html.Div(
     style={"fontFamily": "Roboto, sans-serif", "backgroundColor": "#F5F5F5", "padding": "20px", "justify-content": "center","direction": "rtl"},
     children=[
         html.H1(
-            "نظرة عامة على توزيع الموظفين - المملكة العربية السعودية",
+            "وين وصلنا في السعودة؟",
             style={"textAlign": "center", "color": "#333333"}
+        ),
+        html.P((
+            ["لو سافرنا بالزمن ورجعنا 10 سنين, بنلاحظ التطور الكبير الي وصلت له المملكة العربية السعودية خلال هذي الفترة خصوصا في مجال السعودة وتمكين أبناء الوطن.",
+            html.Br(),
+            "تدري ان السعودية احتلت المركز الأول في أعلى معدل نمو بين مجموعة العشرين عام 2022, كيف أثر هذا النمو على توظيف السعوديين؟" ,
+            html.Br(),
+            "في هذي الرحلة بنعرف وين وصلنا في سعودة القطاعات في المملكة العربية السعودية" ,
+                ]
+            ),
+            style={
+                "textAlign": "justify",
+                "color": "#333333",
+                "margin": "20px 0",
+                "lineHeight": "1.8",
+                "fontSize": "18px",
+                "backgroundColor": "#FFFFFF",
+                "padding": "15px",
+                "borderRadius": "8px",
+                "boxShadow": "0px 4px 6px rgba(0, 0, 0, 0.1)"
+            }
         ),
          html.Div(
             style={
@@ -302,27 +322,7 @@ app.layout = html.Div(
                     }
                 )
             ]
-        ),
-        html.P((
-            [".في هذه الصفحة راح نوجهك الئ معلومات مهمه لتوزيع الموظفين في المملكه العربيه السعودية",
-             html.Br(),
-                ".في البداية جانا فضول نعرف إيش أعلى مناطق في السعودية فيهاأكبر نسبة سعودة" ,
-                ]
-                
-            ),
-            style={
-                "textAlign": "justify",
-                "color": "#333333",
-                "margin": "20px 0",
-                "lineHeight": "1.8",
-                "fontSize": "18px",
-                "backgroundColor": "#FFFFFF",
-                "padding": "15px",
-                "borderRadius": "8px",
-                "boxShadow": "0px 4px 6px rgba(0, 0, 0, 0.1)"
-            }
-        ),
-        
+        ),        
         # Add bar chart below the description
         html.Div(
             dcc.Graph(
