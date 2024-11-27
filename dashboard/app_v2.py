@@ -29,8 +29,8 @@ from figures import (
 # Set up file paths
 current_dir = os.getcwd()
 parent_dir = os.path.dirname(current_dir)
-#data_folder_path = os.path.join(parent_dir, "data")
-data_folder_path = r"./data"
+data_folder_path = os.path.join(parent_dir, "data")
+
 # Load data
 region_employee_summary = pd.read_csv(os.path.join(data_folder_path, "region_employee_summary.csv"))
 df_activity_region = pd.read_csv(os.path.join(data_folder_path, "df_activity_region.csv"))
