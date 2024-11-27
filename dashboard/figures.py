@@ -209,3 +209,27 @@ def create_last5_acti_bar(last_activities):
                         text=[f"{v:.1%}" for v in last_activities.head(5)["total_non_saudis_percentage"]], 
                         textposition="outside"))
     return last5
+
+def create_pie(df, region):
+    # Pie chart
+    aggregated_data = df[['Number_Of_Saudis', 'Number_Of_Nonsaudis']].sum()
+    pie_data = pd.DataFrame({'Category': ['السعوديين', 'الغير سعوديين'], 'Count': aggregated_data})
+      # Create pie chart
+    pie_fig = px.pie(
+        pie_data,
+        names='Category',
+        values='Count',
+        title=f"توزيع الموظفين السعوديين في {region}",
+        color='Category',
+        color_discrete_map={
+            'السعوديين': '#008000',       # Emerald green
+            'الغير سعوديين': '#00509E'   # Soft navy blue
+        }
+    )
+    pie_fig.update_layout(
+        title={"x": 0.5, "xanchor": "center"},
+        font=dict(color="#333333"),
+        plot_bgcolor="#F5F5F5",
+        paper_bgcolor="#F5F5F5"
+    )
+    return pie_fig

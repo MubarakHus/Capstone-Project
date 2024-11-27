@@ -20,7 +20,8 @@ from figures import (
     #create_njran5_bar,
     create_last5_bar,
     create_line_chart,
-    create_last5_acti_bar
+    create_last5_acti_bar,
+    create_pie
 )
 
 
@@ -38,6 +39,10 @@ activity_programming = pd.read_csv(os.path.join(data_folder_path, "activity_prog
 
 # Calculate totals
 lastQ= df_activity_region[df_activity_region["Qseries"] == "2024-7"]
+lastQ_eco = lastQ.groupby("Economic_Activity")[['Number_Of_Establishments', 'Number_Of_Saudis', 'Number_Of_Male_Saudis', 'Number_Of_Female_Saudis', 'Number_Of_Nonsaudis', 'Number_Of_Male_Nonaudis', 'Number_Of_Female_Nonaudis', 'total_employees']].sum().reset_index()
+lastQ_region = lastQ.groupby("region")[['Number_Of_Establishments', 'Number_Of_Saudis', 'Number_Of_Male_Saudis', 'Number_Of_Female_Saudis', 'Number_Of_Nonsaudis', 'Number_Of_Male_Nonaudis', 'Number_Of_Female_Nonaudis', 'total_employees']].sum().reset_index()
+
+
 total_saudis = lastQ["Number_Of_Saudis"].sum()
 total_nonsaudis = lastQ["Number_Of_Nonsaudis"].sum()
 
@@ -59,15 +64,18 @@ def get_percent(df):
 
 get_percent(df_activity_region)
 get_percent(lastQ)
+get_percent(lastQ_eco)
+get_percent(lastQ_region)
+
+lastQ_region = lastQ_region.sort_values(by="total_saudis_percentage", ascending=False)
+lastQ_region['order'] = range(1, len(lastQ_region) + 1)
 
 top1_region = lastQ[lastQ["region"] == "المنطقة الشرقية"]
 last_region = lastQ[lastQ["region"] == "منطقة نجران"]
-all_regions = lastQ.groupby(['region', 'Economic_Activity'])[['Number_Of_Establishments', 'Number_Of_Saudis', 'Number_Of_Male_Saudis', 'Number_Of_Female_Saudis', 'Number_Of_Nonsaudis', 'Number_Of_Male_Nonaudis', 'Number_Of_Female_Nonaudis', 'total_employees']].sum()
-get_percent(all_regions)
 
 top_activities = top1_region.nlargest(5, "total_saudis_percentage")
 top_activities_last = last_region.nlargest(5, "total_saudis_percentage")
-last_activities = all_regions.nsmallest(5, "total_saudis_percentage")
+last_activities = lastQ_eco.nsmallest(5, "total_saudis_percentage")
 
 # Add latitude and longitude to the data
 region_coordinates = {
@@ -221,7 +229,7 @@ tab2_content = dbc.Card(
             # Title and Introduction
             html.H5("تحليل السعودة", className="card-title"),
             html.P(
-                [
+                [ 
                     "لو سافرنا بالزمن ورجعنا 10 سنين، بنلاحظ الفرق في التطور الكبير الي وصلت له المملكة العربية السعودية في السنوات الاخيرة خصوصا في مجال السعودة وتمكين أبناء الوطن.",
                     html.Br(),
                     "هل كنت تدري أن السعودية احتلت المركز الأول في أعلى معدل نمو بين مجموعة العشرين عام 2022؟ كيف أثر هذا النمو على توظيف السعوديين؟",
@@ -241,9 +249,42 @@ tab2_content = dbc.Card(
                 "وين تتوقع أعلى منطقة في نسبة السعودة؟",
                 style={"marginTop": "20px"},
             ),
-            dcc.Graph(
-                id="map-chart",
-                figure=create_map_chart(region_employee_summary),
+            dcc.Dropdown(
+        id="region-dropdown",
+        options=[{"label": region, "value": region} for region in lastQ_region["region"].unique()],
+        value=lastQ_region["region"].iloc[5],  # Default value
+        style={"width": "50%", "margin": "auto"}
+    ),
+    dbc.Row(
+                [
+                    # Pie chart in the first column
+                    dbc.Col(
+                        dcc.Graph(id="pie-chart", style={"height": "400px"}),
+                        width=8,  # Adjust width as needed
+                    ),
+                    # Order display in the second column
+                    dbc.Col(
+                        html.Div(
+                            id="order-display",
+                            style={
+                                "textAlign": "center",
+                                "fontSize": "36px",
+                                "fontWeight": "bold",
+                                "color": "#000",
+                                "padding": "10px",
+                                "border": "2px solid #ccc",
+                                "borderRadius": "8px",
+                                "backgroundColor": "#f9f9f9",
+                                "height": "100%",  # Make it align with the pie chart height
+                                "display": "flex",
+                                "justifyContent": "center",
+                                "alignItems": "center",
+                            },
+                        ),
+                        width=4,  # Adjust width as needed
+                    ),
+                ],
+                align="center",  # Center align the row content vertically
             ),
 
             # Top 5 Regions Bar Chart
@@ -260,12 +301,12 @@ tab2_content = dbc.Card(
             html.P(
                 [
                     "نلاحظ أن الشرقية هي أعلى منطقة في نسب السعودة، ",
-                    html.Span("وش السبب؟", style={"color": "red", "fontWeight": "bold"}),
+                    html.Span("وش السبب؟", style={"color": "#000000", "fontWeight": "bold"}),
                     html.Br(),
                     "عشان نعرف الجواب لازم نعرف وش القطاعات المتوفرة في سوق العمل، وحسب ",
                     html.Strong("الدليل الوطني للأنشطة الاقتصادية ISIC4"),
                     " تملك المملكة ",
-                    html.Span("89", style={"color": "red", "fontWeight": "bold"}),
+                    html.Span("89", style={"color": "#000000", "fontWeight": "bold"}),
                     " قطاع في مستوى النشاط الاقتصادي الثاني.",
                     html.Br(),
                     "وش هي أعلى 5 قطاعات في نسب السعودة في الشرقية؟",
@@ -309,7 +350,7 @@ tab2_content = dbc.Card(
                     "نلاحظ أن ",
                     html.Strong("نجران"),
                     " تملك ",
-                    html.Span("أقل", style={"color": "red", "fontWeight": "bold"}),
+                    html.Span("أقل", style={"color": "#000000", "fontWeight": "bold"}),
                     " نسبة سعودة. وجانا فضول نعرف المشكلة في منطقة نجران؟",
                     html.Br(),
                     "لذلك بحثنا عن أكثر النشاطات فيها سعودة في المنطقة.",
@@ -381,7 +422,22 @@ tab2_content = dbc.Card(
             ),
             dcc.Graph(
                 id="last5-bar-chart",
-                #figure=create_last5_acti_bar(last_activities)
+                figure=create_last5_acti_bar(last_activities)
+            ),
+            html.H3(
+                [
+                    "هذا يطرح تساؤل آخر .. هل تتوقعون بالمستقبل بتزيد السعودة في هذي القطاعات؟",
+                ],
+                style={
+                        "textAlign": "center",
+                        "backgroundColor": "#FFFFFF",
+                        "padding": "20px",
+                        "borderRadius": "8px",
+                        "boxShadow": "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                        "color": "#333333",
+                        "fontSize": "18px",
+                        "flex": "1"
+                    },
             ),
         ]
     ),
@@ -640,6 +696,17 @@ app.layout = dbc.Container(
     fluid=True,
 )
 
+@app.callback(
+    Output("order-display", "children"),
+    Input("region-dropdown", "value"),
+)
+def update_order_display(selected_region):
+    # Filter the dataframe to find the order for the selected region
+    selected_order = lastQ_region.loc[
+        lastQ_region["region"] == selected_region, "order"
+    ].values[0]
+    # Return the order as the displayed content
+    return f"ترتيب المنطقة: {selected_order}"
 
 # Callback to update the bar chart
 @app.callback(Output("bar-chart", "figure"), Input("bar-chart", "id"))
@@ -647,6 +714,15 @@ def update_chart(_):
     fig = gender_percentage()
     return fig
 
+@app.callback(
+    Output("pie-chart", "figure"),
+    Input("region-dropdown", "value")
+)
+def update_pie_chart(selected_region):
+    # Filter the DataFrame for the selected region
+    filtered_df = lastQ_region[lastQ_region["region"] == selected_region]
+    # Create the pie chart using the create_pie function
+    return create_pie(filtered_df, selected_region)
 
 @app.callback(Output("region-map", "figure"), Input("region-map", "id"))
 def update_map(_):
