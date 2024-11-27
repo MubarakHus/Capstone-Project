@@ -187,3 +187,25 @@ def create_line_chart(data, title):
         title_x=0.5,
     )
     return line_chart
+
+def create_last5_acti_bar(last_activities):
+ # اقل قطاعات في السعودة في المملكة
+    last5 = go.Figure()
+    colors={
+        'Number_Of_Saudis': '#008000',       # Emerald green
+        'Number_Of_Nonsaudis': '#00509E'    # Soft navy blue
+    }
+    last5.add_trace(go.Bar(x=last_activities["Economic_Activity"],
+                        y=last_activities["total_saudis_percentage"],
+                        name="السعوديين %",
+                        marker_color=colors["Number_Of_Saudis"],
+                        text=[f"{v:.1%}" for v in last_activities.head(5)["total_saudis_percentage"]],  # Format as percentage
+                        textposition="outside"))
+    
+    last5.add_trace(go.Bar(x=last_activities["Economic_Activity"],
+                        y=last_activities["total_non_saudis_percentage"],
+                        name="غير السعوديين %",
+                        marker_color=colors["Number_Of_Nonsaudis"],
+                        text=[f"{v:.1%}" for v in last_activities.head(5)["total_non_saudis_percentage"]], 
+                        textposition="outside"))
+    return last5
