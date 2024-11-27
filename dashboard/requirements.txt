@@ -127,8 +127,6 @@ python-dateutil
 pytz
 pyvis
 PyWavelets
-pywin32
-pywin32-ctypes
 PyYAML
 pyzmq
 RapidFuzz
