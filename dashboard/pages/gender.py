@@ -11,177 +11,6 @@ current_dir = os.getcwd()
 parent_dir = os.path.abspath(os.path.join(current_dir, ".."))
 
 
-def format_number(num):
-    if num >= 1_000_000:
-        return f"{num / 1_000_000:.1f}M"  # millions
-    elif num >= 1_000:
-        return f"{num / 1_000:.1f}K"  # thousands
-    else:
-        return str(num)
-
-
-def gender_percentage():
-    data = pd.read_csv(os.path.join(parent_dir, "data", "saudis_total_2022_2024.csv"))
-    # Calculate total employees and percentages
-    data["Total Employees"] = data["Total Male Saudis"] + data["Total Female Saudis"]
-    data["Male Percentage"] = (
-        data["Total Male Saudis"] / data["Total Employees"]
-    ) * 100
-    data["Female Percentage"] = (
-        data["Total Female Saudis"] / data["Total Employees"]
-    ) * 100
-
-    # Create the bar chart using Plotly Graph Objects
-    fig = go.Figure()
-
-    # Add data for males with percentages
-    fig.add_trace(
-        go.Bar(
-            x=data["Year"],
-            y=data["Male Percentage"],
-            name="ذكور",
-            marker_color="#FFC107",  # Soft navy blue
-            text=data["Male Percentage"].apply(
-                lambda x: f"{x:.1f}%"
-            ),  # Display percentage
-            textposition="outside",  # Show text outside bars
-            width=0.2,
-        )
-    )
-
-    # Add data for females with percentages
-    fig.add_trace(
-        go.Bar(
-            x=data["Year"],
-            y=data["Female Percentage"],
-            name="إناث",
-            marker_color="#FF7F50",  # Peachy coral
-            text=data["Female Percentage"].apply(
-                lambda x: f"{x:.1f}%"
-            ),  # Display percentage
-            textposition="outside",  # Show text outside bars
-            width=0.2,
-        )
-    )
-
-    # Update chart layout
-    fig.update_layout(
-        yaxis_showgrid=False,
-        yaxis={"visible": False, "showticklabels": False},
-        xaxis=dict(title="السنة", title_font=dict(color="#555555")),
-        legend=dict(title="الجنس", font=dict(color="#555555")),
-        plot_bgcolor="white",  # Chart background
-        paper_bgcolor="white",  # Page background
-        font=dict(color="#555555", size=13),
-        barmode="group",  # Grouped bar mode
-    )
-    return fig
-
-
-def gender_map_real_estate():
-    data = pd.read_csv(
-        os.path.join(parent_dir, "data", "male_female_per_region_eco.csv")
-    )
-    data = data[data["Economic_Activity"] == "الأنشطة العقارية"]
-    region_coordinates = {
-        "منطقة الرياض": {"lat": 24.7136, "lon": 46.6753},
-        "منطقة مكة المكرمة": {"lat": 21.3891, "lon": 39.8579},
-        "المنطقة الشرقية": {"lat": 26.4207, "lon": 50.0888},
-        "منطقة المدينة المنورة": {"lat": 24.5247, "lon": 39.5692},
-        "منطقة القصيم": {"lat": 26.3260, "lon": 43.9750},
-        "منطقة عسير": {"lat": 18.2164, "lon": 42.5053},
-        "منطقة تبوك": {"lat": 28.3838, "lon": 36.5650},
-        "منطقة حائل": {"lat": 27.5219, "lon": 41.7057},
-        "منطقة الحدود الشمالية": {"lat": 30.9843, "lon": 41.1183},
-        "منطقة جازان": {"lat": 16.8892, "lon": 42.5700},
-        "منطقة نجران": {"lat": 17.5650, "lon": 44.2236},
-        "منطقة الباحة": {"lat": 20.0129, "lon": 41.4677},
-        "منطقة الجوف": {"lat": 30.3158, "lon": 38.3691},
-    }
-    data["lat"] = data["region"].apply(lambda x: region_coordinates[x]["lat"])
-    data["lon"] = data["region"].apply(lambda x: region_coordinates[x]["lon"])
-    fig = px.scatter_geo(
-        data,
-        lat="lat",
-        lon="lon",
-        size="Rate_Difference",
-        hover_name="region",
-        color="Rate_Difference",
-        projection="natural earth",
-        text=data["region"],
-    )
-    fig.update_geos(
-        scope="asia", center={"lat": 23.8859, "lon": 45.0792}, fitbounds="locations"
-    )
-    fig.update_layout(
-        font=dict(color="#333333"),
-        coloraxis_colorbar=dict(
-            title="% معدل الفرق بين الجنسين",  # Title for the color bar
-            ticks="outside",  # Set ticks to be outside the bar
-            tickwidth=2,  # Width of the ticks
-            ticklen=10,  # Length of the ticks
-            bgcolor="white",  # Chart background
-        ),
-    )
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br> معدل الفرق بين الجنسين %%{marker.size:.1f} <extra></extra>",
-    )
-
-    return fig
-
-
-def gender_map_oil_and_gas():
-    data = pd.read_csv(
-        os.path.join(parent_dir, "data", "male_female_per_region_eco.csv")
-    )
-    data = data[data["Economic_Activity"] == "استخراج النفط الخام والغاز الطبيعي"]
-    region_coordinates = {
-        "منطقة الرياض": {"lat": 24.7136, "lon": 46.6753},
-        "منطقة مكة المكرمة": {"lat": 21.3891, "lon": 39.8579},
-        "المنطقة الشرقية": {"lat": 26.4207, "lon": 50.0888},
-        "منطقة المدينة المنورة": {"lat": 24.5247, "lon": 39.5692},
-        "منطقة القصيم": {"lat": 26.3260, "lon": 43.9750},
-        "منطقة عسير": {"lat": 18.2164, "lon": 42.5053},
-        "منطقة تبوك": {"lat": 28.3838, "lon": 36.5650},
-        "منطقة حائل": {"lat": 27.5219, "lon": 41.7057},
-        "منطقة الحدود الشمالية": {"lat": 30.9843, "lon": 41.1183},
-        "منطقة جازان": {"lat": 16.8892, "lon": 42.5700},
-        "منطقة نجران": {"lat": 17.5650, "lon": 44.2236},
-        "منطقة الباحة": {"lat": 20.0129, "lon": 41.4677},
-        "منطقة الجوف": {"lat": 30.3158, "lon": 38.3691},
-    }
-    data["lat"] = data["region"].apply(lambda x: region_coordinates[x]["lat"])
-    data["lon"] = data["region"].apply(lambda x: region_coordinates[x]["lon"])
-    fig = px.scatter_geo(
-        data,
-        lat="lat",
-        lon="lon",
-        size="Rate_Difference",
-        hover_name="region",
-        color="Rate_Difference",
-        projection="natural earth",
-        text=data["region"],
-    )
-    fig.update_geos(
-        scope="asia", center={"lat": 23.8859, "lon": 45.0792}, fitbounds="locations"
-    )
-    fig.update_layout(
-        font=dict(color="#333333"),
-        coloraxis_colorbar=dict(
-            title="% معدل الفرق بين الجنسين",  # Title for the color bar
-            ticks="outside",  # Set ticks to be outside the bar
-            tickwidth=2,  # Width of the ticks
-            ticklen=10,  # Length of the ticks
-            bgcolor="white",  # Chart background
-        ),
-    )
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br> معدل الفرق بين الجنسين %%{marker.size:.1f} <extra></extra>",
-    )
-
-    return fig
-
-
 def gender_programing(selected_activity=None):
     df = pd.read_csv(os.path.join(parent_dir, "data", "male_female_per_eco.csv"))
     program_eco = df[
@@ -194,36 +23,34 @@ def gender_programing(selected_activity=None):
     # stacked bar chart
     fig = go.Figure()
 
-    fig.add_trace(
-        go.Bar(
-            x=program_eco["Economic_Activity"],
-            y=program_eco["Number_Of_Male_Saudis"],
-            name="ذكر",
-            marker_color="#FFC107",
-            textposition="outside",
-            width=0.2,
-        )
-    )
+    total_male = program_eco["Number_Of_Male_Saudis"].sum()
+    total_female = program_eco["Number_Of_Female_Saudis"].sum()
+    # Data for the pie chart
+    labels = ["ذكر", "أنثى"]
+    values = [total_male, total_female]
 
     fig.add_trace(
-        go.Bar(
-            x=program_eco["Economic_Activity"],
-            y=program_eco["Number_Of_Female_Saudis"],
-            name="أنثى",
-            marker_color="#FF7F50",
-            textposition="outside",
-            width=0.2,
+        go.Pie(
+            labels=labels,
+            values=values,
+            name="الجنس",
+            textinfo="percent",
+            insidetextfont=dict(size=15, color="white"),
+            marker=dict(colors=["#1fb89b", "#e04764"]),
         )
     )
-
     fig.update_layout(
-        yaxis_showgrid=False,
-        yaxis={"visible": False, "showticklabels": False},
-        barmode="group",
         legend_title="الجنس",
-        plot_bgcolor="white",  # Chart background
+        plot_bgcolor="white",
         paper_bgcolor="white",  # Page background
+        margin=dict(t=40, b=40, l=40, r=40),  # Adjust margins
+        title="أنشطة البرمجة والاستشارات",
+        title_x=0.5,
+        title_y=0.05,
+        width=350,
+        height=350,
     )
+
     return fig, rate_differanc_program
 
 
@@ -239,36 +66,34 @@ def lib_managment():
     # stacked bar chart
     fig = go.Figure()
 
-    fig.add_trace(
-        go.Bar(
-            x=lib_managment["Economic_Activity"],
-            y=lib_managment["Number_Of_Male_Saudis"],
-            name="ذكر",
-            marker_color="#FFC107",
-            textposition="outside",
-            width=0.2,
-        )
-    )
+    total_male = lib_managment["Number_Of_Male_Saudis"].sum()
+    total_female = lib_managment["Number_Of_Female_Saudis"].sum()
+    # Data for the pie chart
+    labels = ["ذكر", "أنثى"]
+    values = [total_male, total_female]
 
     fig.add_trace(
-        go.Bar(
-            x=lib_managment["Economic_Activity"],
-            y=lib_managment["Number_Of_Female_Saudis"],
-            name="أنثى",
-            marker_color="#FF7F50",
-            textposition="outside",
-            width=0.2,
+        go.Pie(
+            labels=labels,
+            values=values,
+            name="الجنس",
+            textinfo="percent",
+            insidetextfont=dict(size=15, color="white"),
+            marker=dict(colors=["#1fb89b", "#e04764"]),
         )
     )
-
     fig.update_layout(
-        yaxis_showgrid=False,
-        yaxis={"visible": False, "showticklabels": False},
-        barmode="group",
         legend_title="الجنس",
-        plot_bgcolor="white",  # Chart background
+        plot_bgcolor="white",
         paper_bgcolor="white",  # Page background
+        margin=dict(t=40, b=40, l=40, r=40),  # Adjust margins
+        title="أنشطة ادارة المكتبات ودعم الاعمال",
+        title_x=0.5,
+        title_y=0.05,
+        width=350,
+        height=350,
     )
+
     return fig, rate_differanc_lib_management
 
 
@@ -280,36 +105,32 @@ def real_estate():
 
     # stacked bar chart
     fig = go.Figure()
+    total_male = real_estate["Number_Of_Male_Saudis"].sum()
+    total_female = real_estate["Number_Of_Female_Saudis"].sum()
+    # Data for the pie chart
+    labels = ["ذكر", "أنثى"]
+    values = [total_male, total_female]
 
     fig.add_trace(
-        go.Bar(
-            x=real_estate["Economic_Activity"],
-            y=real_estate["Number_Of_Male_Saudis"],
-            name="ذكر",
-            marker_color="#FFC107",
-            textposition="outside",
-            width=0.2,
+        go.Pie(
+            labels=labels,
+            values=values,
+            name="الجنس",
+            textinfo="percent",
+            insidetextfont=dict(size=15, color="white"),
+            marker=dict(colors=["#1fb89b", "#e04764"]),
         )
     )
-
-    fig.add_trace(
-        go.Bar(
-            x=real_estate["Economic_Activity"],
-            y=real_estate["Number_Of_Female_Saudis"],
-            name="أنثى",
-            marker_color="#FF7F50",
-            textposition="outside",
-            width=0.2,
-        )
-    )
-
     fig.update_layout(
-        yaxis_showgrid=False,
-        yaxis={"visible": False, "showticklabels": False},
-        barmode="group",
         legend_title="الجنس",
-        plot_bgcolor="white",  # Chart background
+        plot_bgcolor="white",
         paper_bgcolor="white",  # Page background
+        margin=dict(t=40, b=40, l=40, r=40),  # Adjust margins
+        title="أنشطة العقار",
+        title_x=0.5,
+        title_y=0.05,
+        width=350,
+        height=350,
     )
     return fig, rate_differanc_real_estate
 
@@ -321,36 +142,32 @@ def oil_and_gas():
     rate_differanc_oil_and_gas = oil_and_gas["Rate_Difference"].values.tolist()[0]
     # stacked bar chart
     fig = go.Figure()
+    total_male = oil_and_gas["Number_Of_Male_Saudis"].sum()
+    total_female = oil_and_gas["Number_Of_Female_Saudis"].sum()
+    # Data for the pie chart
+    labels = ["ذكر", "أنثى"]
+    values = [total_male, total_female]
 
     fig.add_trace(
-        go.Bar(
-            x=oil_and_gas["Economic_Activity"],
-            y=oil_and_gas["Number_Of_Male_Saudis"],
-            name="ذكر",
-            marker_color="#FFC107",
-            textposition="outside",
-            width=0.2,
+        go.Pie(
+            labels=labels,
+            values=values,
+            name="الجنس",
+            textinfo="percent",
+            insidetextfont=dict(size=15, color="white"),
+            marker=dict(colors=["#1fb89b", "#e04764"]),
         )
     )
-
-    fig.add_trace(
-        go.Bar(
-            x=oil_and_gas["Economic_Activity"],
-            y=oil_and_gas["Number_Of_Female_Saudis"],
-            name="أنثى",
-            marker_color="#FF7F50",
-            textposition="outside",
-            width=0.2,
-        )
-    )
-
     fig.update_layout(
-        yaxis_showgrid=False,
-        yaxis={"visible": False, "showticklabels": False},
-        barmode="group",
         legend_title="الجنس",
-        plot_bgcolor="white",  # Chart background
+        plot_bgcolor="white",
         paper_bgcolor="white",  # Page background
+        margin=dict(t=40, b=40, l=40, r=40),  # Adjust margins
+        title="أنشطة استخراج النفط الخام والغاز",
+        title_x=0.5,
+        title_y=0.05,
+        width=350,
+        height=350,
     )
     return fig, rate_differanc_oil_and_gas
 
@@ -390,4 +207,67 @@ def gender_trends():
         plot_bgcolor="white",  # Chart background
         paper_bgcolor="white",  # Page background
     )
+    return fig
+
+
+def gender_map_real_estate():
+    data = pd.read_csv(
+        os.path.join(parent_dir, "data", "male_female_per_region_eco.csv")
+    )
+    data = data[data["Economic_Activity"] == "الأنشطة العقارية"]
+    data = data.sort_values(by="Rate_Difference", ascending=False)
+    fig = go.Figure()
+    color_palette = ["#59a46f", "#59a46f", "#59a46f"]
+    fig.add_trace(
+        go.Bar(
+            x=data["region"],
+            y=data["Rate_Difference"],
+            text=data["Rate_Difference"],
+            textposition="outside",
+            width=0.2,
+            marker_color=color_palette[: len(data)],
+        )
+    )
+    fig.update_layout(
+        xaxis_title="المنطقة",
+        yaxis_title="معدل الفرق",
+        title_x=0.5,
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(size=14),
+        yaxis_showgrid=False,
+        yaxis={"visible": False, "showticklabels": False},
+    )
+
+    return fig
+
+
+def gender_map_oil_and_gas():
+    data = pd.read_csv(
+        os.path.join(parent_dir, "data", "male_female_per_region_eco.csv")
+    )
+    data = data[data["Economic_Activity"] == "استخراج النفط الخام والغاز الطبيعي"]
+    fig = go.Figure()
+    color_palette = ["#59a46f", "#59a46f", "#59a46f"]
+    fig.add_trace(
+        go.Bar(
+            x=data["region"],
+            y=data["Rate_Difference"],
+            text=data["Rate_Difference"],
+            textposition="outside",
+            width=0.1,
+            marker_color=color_palette[: len(data)],
+        )
+    )
+    fig.update_layout(
+        xaxis_title="المنطقة",
+        yaxis_title="معدل الفرق",
+        title_x=0.5,
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(size=14),
+        yaxis_showgrid=False,
+        yaxis={"visible": False, "showticklabels": False},
+    )
+
     return fig
