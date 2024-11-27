@@ -25,8 +25,8 @@ def create_total_bar(total_saudis, total_nonsaudis):
                 x=["الموظفين السعوديين"],
                 y=[total_saudis],
                 text=f"{total_saudis:,}",
-                textposition="inside",
-                marker_color="#008000",
+                textposition="outside",
+                marker_color="#59a46f",
                 width=0.2,
             ),
             go.Bar(
@@ -34,8 +34,8 @@ def create_total_bar(total_saudis, total_nonsaudis):
                 x=["الموظفين غير السعوديين"],
                 y=[total_nonsaudis],
                 text=f"{total_nonsaudis:,}",
-                textposition="inside",
-                marker_color="#00509E",
+                textposition="outside",
+                marker_color="#02317E",
                 width=0.2,
             ),
         ]
@@ -101,11 +101,11 @@ def create_top5_bar(top_5_regions):
             marker=dict(
                 color=top_5_regions["total_saudis_percentage"],
                 colorscale=[
-                    "#5bb450",
-                    "#52a447",
-                    "#46923c",
-                    "#3b8132",
-                    "#276221",
+                    "#122116",
+                    "#24422c",
+                    "#356243",
+                    "#478359",
+                    "#59a46f",
                 ],
             ),
             width=0.3,
@@ -133,8 +133,8 @@ def create_top5_bar(top_5_regions):
 def create_shrqya5_bar(top_activities):
     shrqya5 = go.Figure()
     colors = {
-        "Number_Of_Saudis": "#008000",
-        "Number_Of_Nonsaudis": "#00509E",
+        "Number_Of_Saudis": "#59a46f",
+        "Number_Of_Nonsaudis": "#02317E",
     }
     shrqya5.add_trace(
         go.Bar(
@@ -207,11 +207,11 @@ def create_last5_bar(last_5_regions):
                         "total_saudis_percentage"
                     ],  # Color based on percentage
                     colorscale=[
-                        "#5bb450",
-                        "#52a447",
-                        "#46923c",
-                        "#3b8132",
-                        "#276221",
+                        "#122116",
+                        "#24422c",
+                        "#356243",
+                        "#478359",
+                        "#59a46f",
                     ],
                     showscale=True,
                 ),
@@ -285,8 +285,8 @@ def create_last5_acti_bar(last_activities):
     # اقل قطاعات في السعودة في المملكة
     last5 = go.Figure()
     colors = {
-        "Number_Of_Saudis": "#008000",  # Emerald green
-        "Number_Of_Nonsaudis": "#00509E",  # Soft navy blue
+        "Number_Of_Saudis": "#59a46f",  # Emerald green
+        "Number_Of_Nonsaudis": "#02317E",  # Soft navy blue
     }
     last5.add_trace(
         go.Bar(

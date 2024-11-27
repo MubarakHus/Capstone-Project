@@ -4,7 +4,7 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
 from dash_bootstrap_components._components.Container import Container
-from pages.page1 import *
+
 from pages.gender import *
 from figures import *
 from pages.overview import *
@@ -33,7 +33,6 @@ navbar = dbc.Navbar(
                 # Use row and col to control vertical alignment of logo / brand
                 dbc.Row(
                     [
-                        dbc.Col(html.Img(src="./assets/رؤية نمو.png", height="30px")),
                         dbc.Col(
                             dbc.NavbarBrand(
                                 "رؤية نمو", className="me-2", style={"color": "white"}
@@ -731,7 +730,7 @@ tabs = dbc.Tabs(
             label_style={"color": "#333333"},
         ),
         dbc.Tab(
-            tab3_content, label="تحليل حسب الجنس", label_style={"color": "#333333"}
+            tab3_content, label="التوازن بين الجنسين", label_style={"color": "#333333"}
         ),
     ],
 )

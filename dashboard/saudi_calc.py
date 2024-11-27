@@ -5,7 +5,6 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
 from dash_bootstrap_components._components.Container import Container
-from pages.page1 import *
 from pages.gender import *
 import os
 import plotly.express as px
